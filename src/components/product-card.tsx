@@ -95,8 +95,8 @@ const ProductCard = ({ item }: ProductCardProps) => {
         </div>
 
         {/* Quantity */}
-        <div>
-          <p className="text-sm font-medium text-gray-600 mb-2">Quantity</p>
+        <div className="flex items-center justify-between pt-1">
+          <p className="text-sm font-medium text-gray-600">Quantity</p>
 
           <Counter
             value={quantity}
@@ -106,12 +106,16 @@ const ProductCard = ({ item }: ProductCardProps) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col gap-3 mt-auto">
+        <div className="flex flex-col gap-2.5 mt-auto pt-2">
           <Button
             disabled={item.availableItems <= 0 || adding}
             onClick={handleAddToCart}
-            className={`w-full py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${
-              added ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""
+            className={`w-full py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 shadow-xs hover:shadow-md ${
+              item.availableItems <= 0
+                ? "bg-gray-100 text-gray-400 border border-gray-200"
+                : added
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600"
+                  : "bg-blue-600 hover:bg-blue-700 text-white border border-blue-600"
             }`}
           >
             {item.availableItems <= 0
@@ -125,18 +129,8 @@ const ProductCard = ({ item }: ProductCardProps) => {
 
           <Button
             onClick={() => navigate(`/product/${item._id}`)}
-            className="
-      w-full
-      py-2.5
-      text-sm
-      font-semibold
-      rounded-lg
-      bg-gray-100
-      text-gray-700
-      hover:bg-gray-200
-      transition-all
-      duration-200
-    "
+            variant="outline"
+            className="w-full py-2.5 text-sm font-semibold rounded-xl bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-2xs"
           >
             VIEW PRODUCT
           </Button>

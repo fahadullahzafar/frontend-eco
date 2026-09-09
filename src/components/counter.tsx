@@ -1,5 +1,3 @@
-import Button from "./button";
-
 interface CounterProps {
   value: number;
   minValue?: number;
@@ -14,66 +12,31 @@ function Counter({
   onChange,
 }: CounterProps) {
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="inline-flex items-center rounded-xl border border-gray-200 bg-gray-50/70 p-1 shadow-2xs">
       {/* Decrease */}
-      <Button
-        className="
-          w-9 h-9
-          flex items-center justify-center
-          rounded-md
-          bg-blue-500
-          hover:bg-blue-600
-          disabled:bg-blue-400
-          disabled:text-white
-          disabled:cursor-not-allowed
-          text-white
-          text-lg
-          font-bold
-          transition-colors
-        "
+      <button
+        type="button"
+        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-700 text-base font-bold shadow-2xs hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-95 cursor-pointer"
         disabled={value <= minValue}
         onClick={() => onChange(Math.max(minValue, value - 1))}
       >
         −
-      </Button>
+      </button>
 
       {/* Quantity */}
-      <span
-        className="
-          w-10 h-9
-          flex items-center justify-center
-          rounded-md
-          border border-gray-200
-          bg-gray-50
-          text-base
-          font-semibold
-          text-gray-700
-        "
-      >
+      <span className="w-10 text-center text-sm font-semibold text-gray-800 select-none">
         {value}
       </span>
 
       {/* Increase */}
-      <Button
-        className="
-          w-9 h-9
-          flex items-center justify-center
-          rounded-md
-          bg-blue-500
-          hover:bg-blue-600
-          disabled:bg-blue-400
-          disabled:text-white
-          disabled:cursor-not-allowed
-          text-white
-          text-lg
-          font-bold
-          transition-colors
-        "
+      <button
+        type="button"
+        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-700 text-base font-bold shadow-2xs hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-95 cursor-pointer"
         disabled={value >= maxValue}
         onClick={() => onChange(Math.min(maxValue, value + 1))}
       >
         +
-      </Button>
+      </button>
     </div>
   );
 }

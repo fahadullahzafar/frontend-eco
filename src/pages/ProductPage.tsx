@@ -134,8 +134,12 @@ function ProductPage() {
             <Button
               onClick={handleAddToCart}
               disabled={product.availableItems <= 0 || adding}
-              className={`w-full py-3 text-lg transition-all duration-200 ${
-                added ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""
+              className={`w-full py-3 text-base font-semibold rounded-xl transition-all duration-200 shadow-xs ${
+                product.availableItems <= 0
+                  ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+                  : added
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600"
+                    : "bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 active:scale-[0.99]"
               }`}
             >
               {product.availableItems <= 0
