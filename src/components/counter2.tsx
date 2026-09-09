@@ -5,14 +5,10 @@ interface CounterProps {
   minValue?: number;
   maxValue?: number;
   onChange: (value: number) => void;
+  onReset: () => void;
 }
 
-function Counter({
-  value,
-  minValue = 1,
-  maxValue = Infinity,
-  onChange,
-}: CounterProps) {
+function Counter2({ value, minValue = 1, onChange, onReset }: CounterProps) {
   return (
     <div className="flex items-center justify-center gap-2">
       {/* Decrease */}
@@ -45,7 +41,7 @@ function Counter({
           rounded-md
           border border-gray-200
           bg-gray-50
-          text-base
+          text-sm
           font-semibold
           text-gray-700
         "
@@ -53,29 +49,26 @@ function Counter({
         {value}
       </span>
 
-      {/* Increase */}
+      {/* Remove */}
       <Button
         className="
-          w-9 h-9
+          h-9
+          px-3
           flex items-center justify-center
           rounded-md
-          bg-blue-500
-          hover:bg-blue-600
-          disabled:bg-blue-400
-          disabled:text-white
-          disabled:cursor-not-allowed
+          bg-red-500
+          hover:bg-red-600
           text-white
-          text-lg
-          font-bold
+          text-sm
+          font-semibold
           transition-colors
         "
-        disabled={value >= maxValue}
-        onClick={() => onChange(Math.min(maxValue, value + 1))}
+        onClick={onReset}
       >
-        +
+        Remove
       </Button>
     </div>
   );
 }
 
-export default Counter;
+export default Counter2;

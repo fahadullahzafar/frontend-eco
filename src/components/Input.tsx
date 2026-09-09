@@ -1,14 +1,17 @@
-import type { InputHTMLAttributes } from 'react';
+import type { InputHTMLAttributes } from "react";
 
 function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-
-    return (
-        <input {...props}
-            className="w-2/3 px-1 border-solid border-2"
-            style={{
-                ...props.style
-            }
-            }></input>
-    )
+  return (
+    <input
+      {...props}
+      className={`px-3 py-2 border-2 border-gray-300 rounded-lg
+        focus:outline-none focus:border-blue-500
+        transition ${props.className ?? ""}`}
+      style={{
+        ...props.style,
+      }}
+    />
+  );
 }
-export default Input
+
+export default Input;
