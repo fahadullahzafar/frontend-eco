@@ -1,20 +1,11 @@
-const handleReset = async (productId: string) => {
-  const token = localStorage.getItem("token");
+import api from "../../api/axios";
 
+const handleReset = async (productId: string) => {
   try {
     console.log("Reset products id:", productId);
-    const response = await fetch(`http://localhost:3000/cart/${productId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.delete(`/cart/${productId}`);
 
-    if (!response.ok) {
-      throw new Error("Failed to reset cart item");
-    }
-
-    const data = await response.json();
+    const data = response.data;
 
     console.log("updated Cart:", data);
     return data;

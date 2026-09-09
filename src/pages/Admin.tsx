@@ -87,7 +87,7 @@ function Admin() {
                         const success = await handleDelete(product._id);
 
                         if (success) {
-                          setProduct((prev) =>
+                          setProducts((prev) =>
                             prev.filter((item) => item._id !== product._id),
                           );
                         }

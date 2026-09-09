@@ -1,22 +1,15 @@
+import api from "../../api/axios";
+
 export const handleCart = async (productId: string, quantity: number) => {
   console.log("Clicked, productId");
 
   try {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch("http://localhost:3000/cart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        productId: productId,
-        quantity: quantity,
-      }),
+    const response = await api.post("/cart", {
+      productId: productId,
+      quantity: quantity,
     });
 
-    const data = await response.json();
+    const data = response.data;
     console.log("Cart:", data);
     console.log("quantity:", quantity);
     return data;

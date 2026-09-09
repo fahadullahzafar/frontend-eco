@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import api from "../api/axios";
 
 function Orders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -8,32 +9,16 @@ function Orders() {
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     // Search ke liye debounce
     const timeout = setTimeout(() => {
       if (!loading) {
         setSearching(true);
       }
 
-      fetch(
-        `http://localhost:3000/orders?search=${encodeURIComponent(search)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      api.get(`/orders?search=${encodeURIComponent(search)}`)
         .then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to get orders");
-          }
-
-          return res.json();
-        })
-        .then((data) => {
-          console.log("Orders:", data);
-          setOrders(data);
+          console.log("Orders:", res.data);
+          setOrders(res.data);
         })
         .catch((error) => {
           console.log(error);

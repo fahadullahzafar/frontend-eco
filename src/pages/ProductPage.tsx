@@ -8,6 +8,8 @@ import Counter from "../components/counter";
 import { handleCart } from "../components/function/handlecart";
 import { useNavigate } from "react-router-dom";
 
+import api from "../api/axios";
+
 function ProductPage() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -16,15 +18,9 @@ function ProductPage() {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/products/${id}`)
+    api.get(`/products/${id}`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("PRoduct not found");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setProduct(data);
+        setProduct(res.data);
       })
       .catch((error) => {
         console.log(error);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Product } from "../interfaces/product";
 import ProductCard from "../components/product-card";
 import { io } from "socket.io-client";
+import api from "../api/axios";
 
 function Home() {
   const [products, setProduct] = useState<Product[]>([]);
@@ -23,17 +24,11 @@ function Home() {
     setLoading(true);
     setError("");
 
-    fetch(
-      `http://localhost:3000/products?page=${currentPage}&limit=${productsPerPage}&search=${encodeURIComponent(search)}`,
+    api.get(
+      `/products?page=${currentPage}&limit=${productsPerPage}&search=${encodeURIComponent(search)}`,
     )
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch products");
-        }
-
-        return res.json();
-      })
-      .then((data) => {
+        const data = res.data;
         console.log(data);
 
         setProduct(data.products);

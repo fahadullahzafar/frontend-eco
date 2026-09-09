@@ -3,30 +3,18 @@ import CartCard from "../components/CartCard";
 import Button from "../components/button";
 import { io } from "socket.io-client";
 import handleReset from "../components/function/handlereset";
+import api from "../api/axios";
 
 function Cart() {
   const [cart, setCart] = useState<any>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     // 👇 YE GET CART FUNCTION HAI
     const getCart = () => {
-      fetch("http://localhost:3000/cart", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      api.get("/cart")
         .then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to get cart");
-          }
-
-          return res.json();
-        })
-        .then((data) => {
-          setCart(data);
+          setCart(res.data);
         })
         .catch((error) => {
           console.error(error);
@@ -89,27 +77,12 @@ function Cart() {
   };
 
   const handleConfirmSelected = async () => {
-    const token = localStorage.getItem("token");
-
     try {
-      const response = await fetch("http://localhost:3000/orders", {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-
-        body: JSON.stringify({
-          productIds: selectedItems,
-        }),
+      const response = await api.post("/orders", {
+        productIds: selectedItems,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create order");
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       console.log("Order successful:", data);
 
@@ -124,36 +97,14 @@ function Cart() {
   };
 
   const handleDeleteSelected = async () => {
-    const token = localStorage.getItem("token");
-
     try {
       for (const productId of selectedItems) {
-        const response = await fetch(
-          `http://localhost:3000/cart/${productId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to delete product ${productId}`);
-        }
+        await api.delete(`/cart/${productId}`);
       }
 
-      const response = await fetch("http://localhost:3000/cart", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.get("/cart");
 
-      if (!response.ok) {
-        throw new Error("Failed to refresh cart");
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       setCart(data);
       setSelectedItems([]);
@@ -166,27 +117,12 @@ function Cart() {
     productId: string,
     newQuantity: number,
   ) => {
-    const token = localStorage.getItem("token");
-
     try {
-      const response = await fetch(`http://localhost:3000/cart/${productId}`, {
-        method: "PATCH",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-
-        body: JSON.stringify({
-          quantity: newQuantity,
-        }),
+      const response = await api.patch(`/cart/${productId}`, {
+        quantity: newQuantity,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update quantity");
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       setCart(data.cart);
     } catch (error) {
