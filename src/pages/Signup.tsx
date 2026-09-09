@@ -3,13 +3,34 @@ import { useNavigate } from "react-router-dom";
 import Button from "../components/button";
 import Input from "../components/Input";
 import handleSignup from "../components/function/handleSignup";
+import { useAuth } from "../context/AuthContext";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
+
+  const onSubmit = async () => {
+    if (!email || !username || !password || !confirmPassword) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    const result = await handleSignup(email, username, password, confirmPassword);
+    setLoading(false);
+
+    if (result.success && result.token) {
+      login(result.token);
+      navigate("/");
+    } else {
+      alert(result.message || "Signup Failed");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
@@ -86,11 +107,10 @@ function Signup() {
           {/* Register Button */}
           <Button
             className="w-full py-3 mt-2 text-base font-semibold"
-            onClick={() =>
-              handleSignup(email, username, password, confirmPassword)
-            }
+            disabled={loading}
+            onClick={onSubmit}
           >
-            CREATE ACCOUNT
+            {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
           </Button>
         </div>
 

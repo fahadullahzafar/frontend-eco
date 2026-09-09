@@ -4,7 +4,8 @@ import { useState } from "react";
 import type { Product } from "../interfaces/product";
 import Button from "./button";
 import Counter from "./counter";
-import { handleCart } from "./function/handlecart";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 interface ProductCardProps {
   item: Product;
@@ -14,18 +15,27 @@ interface ProductCardProps {
 const ProductCard = ({ item }: ProductCardProps) => {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+  const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
 
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login");
+    if (!isLoggedIn) {
+      navigate("/Login");
       return;
     }
 
-    const data = await handleCart(item._id, quantity);
+    setAdding(true);
+    const result = await addToCart(item._id, quantity);
+    setAdding(false);
 
-    console.log("Response from add to cart:", data);
+    if (result.success) {
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+    } else {
+      alert(result.message || "Failed to add to cart");
+    }
   };
 
   return (
@@ -98,21 +108,19 @@ const ProductCard = ({ item }: ProductCardProps) => {
         {/* Buttons */}
         <div className="flex flex-col gap-3 mt-auto">
           <Button
-            disabled={item.availableItems <= 0}
+            disabled={item.availableItems <= 0 || adding}
             onClick={handleAddToCart}
-            className="
-      w-full
-      py-2.5
-      text-sm
-      font-semibold
-      rounded-lg
-      transition-all
-      duration-200
-      shadow-sm
-      hover:shadow-md
-    "
+            className={`w-full py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${
+              added ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""
+            }`}
           >
-            {item.availableItems <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
+            {item.availableItems <= 0
+              ? "OUT OF STOCK"
+              : added
+                ? "✓ ADDED TO CART"
+                : adding
+                  ? "ADDING..."
+                  : "ADD TO CART"}
           </Button>
 
           <Button

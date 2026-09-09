@@ -1,28 +1,18 @@
 import { useEffect, useState } from "react";
 import CartCard from "../components/CartCard";
 import Button from "../components/button";
-import handleReset from "../components/function/handlereset";
+import { useCart } from "../context/CartContext";
 import api from "../api/axios";
 
 function Cart() {
-  const [cart, setCart] = useState<any>(null);
+  const { cart, setCart, updateQuantity, removeFromCart, fetchCart } = useCart();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   useEffect(() => {
-    // 👇 YE GET CART FUNCTION HAI
-    const getCart = () => {
-      api.get("/cart")
-        .then((res) => {
-          setCart(res.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
+    fetchCart();
+  }, [fetchCart]);
 
-    // Page open hone par
-    getCart();
-  }, []);
+  const items = cart?.items || [];
 
   const toggleSelect = (id: string) => {
     setSelectedItems((previous) =>
@@ -33,15 +23,15 @@ function Cart() {
   };
 
   const selectAll = () => {
-    if (selectedItems.length === cart?.items?.length) {
+    if (selectedItems.length === items.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cart?.items?.map((item: any) => item.productId) || []);
+      setSelectedItems(items.map((item) => item.productId));
     }
   };
 
   const isAllSelected =
-    cart?.items?.length > 0 && selectedItems.length === cart.items.length;
+    items.length > 0 && selectedItems.length === items.length;
 
   const handleConfirm = (productId: string) => {
     console.log("Confirm:", productId);
@@ -52,15 +42,8 @@ function Cart() {
   };
 
   const resetItem = async (productId: string) => {
-    const data = await handleReset(productId);
-
-    console.log("Cart after reset:", data);
-
-    if (data) {
-      setCart(data);
-
-      setSelectedItems((previous) => previous.filter((id) => id !== productId));
-    }
+    await removeFromCart(productId);
+    setSelectedItems((previous) => previous.filter((id) => id !== productId));
   };
 
   const handleConfirmSelected = async () => {
@@ -70,33 +53,27 @@ function Cart() {
       });
 
       const data = response.data;
-
       console.log("Order successful:", data);
 
       setCart(data.cart);
       setSelectedItems([]);
 
       alert("Order placed successfully!");
-    } catch (error) {
-      console.log("Order error:", error);
-      alert("Failed to place order");
+    } catch (error: any) {
+      console.error("Order error:", error);
+      const msg = error.response?.data?.message || "Failed to place order";
+      alert(msg);
     }
   };
 
   const handleDeleteSelected = async () => {
     try {
       for (const productId of selectedItems) {
-        await api.delete(`/cart/${productId}`);
+        await removeFromCart(productId);
       }
-
-      const response = await api.get("/cart");
-
-      const data = response.data;
-
-      setCart(data);
       setSelectedItems([]);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -104,37 +81,22 @@ function Cart() {
     productId: string,
     newQuantity: number,
   ) => {
-    try {
-      const response = await api.patch(`/cart/${productId}`, {
-        quantity: newQuantity,
-      });
-
-      const data = response.data;
-
-      setCart(data.cart);
-    } catch (error) {
-      console.log(error);
-    }
+    await updateQuantity(productId, newQuantity);
   };
 
   /*
    * Calculate selected items total
    */
-  const selectedTotal =
-    cart?.items
-      ?.filter((item: any) => selectedItems.includes(item.productId))
-      ?.reduce(
-        (total: number, item: any) => total + item.price * item.quantity,
-        0,
-      ) || 0;
+  const selectedTotal = items
+    .filter((item) => selectedItems.includes(item.productId))
+    .reduce((total, item) => total + item.price * item.quantity, 0);
 
   /*
    * Total quantity of selected items
    */
-  const selectedQuantity =
-    cart?.items
-      ?.filter((item: any) => selectedItems.includes(item.productId))
-      ?.reduce((total: number, item: any) => total + item.quantity, 0) || 0;
+  const selectedQuantity = items
+    .filter((item) => selectedItems.includes(item.productId))
+    .reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8 md:px-10">
@@ -148,7 +110,7 @@ function Cart() {
       </div>
 
       {/* EMPTY CART */}
-      {cart?.items?.length === 0 && (
+      {items.length === 0 && (
         <div className="flex min-h-80 items-center justify-center rounded-2xl bg-white shadow-sm">
           <div className="text-center">
             <div className="mb-4 text-6xl">🛒</div>
@@ -161,7 +123,7 @@ function Cart() {
       )}
 
       {/* CART */}
-      {cart?.items?.length > 0 && (
+      {items.length > 0 && (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* LEFT SIDE */}
           <div className="lg:col-span-2">
@@ -179,14 +141,14 @@ function Cart() {
               </label>
 
               <span className="text-sm text-gray-500">
-                {cart.items.length} item
-                {cart.items.length !== 1 && "s"}
+                {items.length} item
+                {items.length !== 1 && "s"}
               </span>
             </div>
 
             {/* PRODUCTS */}
             <div>
-              {cart.items.map((item: any) => (
+              {items.map((item: any) => (
                 <CartCard
                   key={item._id}
                   item={item}

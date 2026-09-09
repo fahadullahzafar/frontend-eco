@@ -4,11 +4,32 @@ import { useNavigate } from "react-router-dom";
 import Button from "../components/button";
 import Input from "../components/Input";
 import handleLogin from "../components/function/handlelogin";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
+
+  const onSubmit = async () => {
+    if (!email || !password) {
+      alert("Please enter both email and password");
+      return;
+    }
+
+    setLoading(true);
+    const result = await handleLogin(email, password);
+    setLoading(false);
+
+    if (result.success && result.token) {
+      login(result.token);
+      navigate("/");
+    } else {
+      alert(result.message || "Login Failed");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
@@ -53,9 +74,10 @@ function Login() {
           {/* Login Button */}
           <Button
             className="w-full py-3 mt-2 text-base font-semibold"
-            onClick={() => handleLogin(email, password)}
+            disabled={loading}
+            onClick={onSubmit}
           >
-            LOGIN
+            {loading ? "LOGGING IN..." : "LOGIN"}
           </Button>
         </div>
 

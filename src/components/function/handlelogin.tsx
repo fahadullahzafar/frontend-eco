@@ -1,4 +1,5 @@
 import api from "../../api/axios";
+
 const handleLogin = async (login: string, password: string) => {
   try {
     const response = await api.post("/auth/login", {
@@ -6,15 +7,12 @@ const handleLogin = async (login: string, password: string) => {
       password,
     });
 
-    console.log(response.data);
-
-    localStorage.setItem("token", response.data.access_token);
-    window.location.href = "/";
-
-    alert("Login Successful");
-  } catch (error) {
-    console.log(error);
-    alert("Login Failed");
+    return { success: true, token: response.data.access_token };
+  } catch (error: any) {
+    console.error("Login error:", error);
+    const message = error.response?.data?.message || "Login Failed";
+    return { success: false, message };
   }
 };
+
 export default handleLogin;

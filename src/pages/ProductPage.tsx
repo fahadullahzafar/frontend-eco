@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import type { Product } from "../interfaces/product";
 import Button from "../components/button";
 import Counter from "../components/counter";
-import { handleCart } from "../components/function/handlecart";
-import { useNavigate } from "react-router-dom";
-
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
 function ProductPage() {
@@ -15,6 +14,11 @@ function ProductPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     api.get(`/products/${id}`)
@@ -26,7 +30,6 @@ function ProductPage() {
       });
   }, [id]);
 
-
   if (!product) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -37,14 +40,21 @@ function ProductPage() {
 
   // ADD TO CART
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login");
+    if (!isLoggedIn) {
+      navigate("/Login");
       return;
     }
-    const data = await handleCart(product._id, quantity);
-    console.log("respond from add to cart:", data);
+
+    setAdding(true);
+    const result = await addToCart(product._id, quantity);
+    setAdding(false);
+
+    if (result.success) {
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+    } else {
+      alert(result.message || "Failed to add to cart");
+    }
   };
 
   return (
@@ -123,10 +133,18 @@ function ProductPage() {
             {/* Add to Cart */}
             <Button
               onClick={handleAddToCart}
-              disabled={product.availableItems <= 0}
-              className="w-full py-3 text-lg"
+              disabled={product.availableItems <= 0 || adding}
+              className={`w-full py-3 text-lg transition-all duration-200 ${
+                added ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""
+              }`}
             >
-              {product.availableItems <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
+              {product.availableItems <= 0
+                ? "OUT OF STOCK"
+                : added
+                  ? "✓ ADDED TO CART"
+                  : adding
+                    ? "ADDING..."
+                    : "ADD TO CART"}
             </Button>
           </div>
         </div>
