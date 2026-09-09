@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CartCard from "../components/CartCard";
 import Button from "../components/button";
-import { io } from "socket.io-client";
 import handleReset from "../components/function/handlereset";
 import api from "../api/axios";
 
@@ -23,18 +22,6 @@ function Cart() {
 
     // Page open hone par
     getCart();
-
-    // Socket
-    const socket = io("http://localhost:3000");
-
-    socket.on("cartUpdated", () => {
-      getCart(); // 👈 Socket event aate hi dobara backend se cart fetch
-    });
-
-    return () => {
-      socket.off("cartUpdated");
-      socket.disconnect();
-    };
   }, []);
 
   const toggleSelect = (id: string) => {

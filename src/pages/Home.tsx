@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Product } from "../interfaces/product";
 import ProductCard from "../components/product-card";
-import { io } from "socket.io-client";
 import api from "../api/axios";
 
 function Home() {
@@ -44,37 +43,6 @@ function Home() {
       });
   }, [currentPage, search]);
 
-  // Real-time stock update
-  useEffect(() => {
-    const socket = io("http://localhost:3000");
-
-    socket.on("productsUpdated", (data) => {
-      setProduct((previousProducts) =>
-        previousProducts.map((product) =>
-          product._id === data.productId
-            ? {
-                ...product,
-                availableItems: data.availableItems,
-              }
-            : product,
-        ),
-      );
-    });
-
-    return () => {
-      socket.off("productsUpdated");
-      socket.disconnect();
-    };
-  }, []);
-
-  // Update stock
-  const updateStock = (productId: string, availableItems: number) => {
-    setProduct((previousProducts) =>
-      previousProducts.map((product) =>
-        product._id === productId ? { ...product, availableItems } : product,
-      ),
-    );
-  };
 
   // Search
   const handleSearch = (value: string) => {
@@ -208,7 +176,6 @@ function Home() {
                 <ProductCard
                   item={item}
                   key={item._id}
-                  onStockUpdate={updateStock}
                 />
               ))}
             </div>

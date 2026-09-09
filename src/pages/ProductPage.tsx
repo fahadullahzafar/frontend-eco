@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { io } from "socket.io-client";
 
 import type { Product } from "../interfaces/product";
 import Button from "../components/button";
@@ -26,28 +25,7 @@ function ProductPage() {
         console.log(error);
       });
   }, [id]);
-  // Real-time stock update
-  useEffect(() => {
-    const socket = io("http://localhost:3000");
 
-    socket.on("productsUpdated", (data) => {
-      if (data.productId === id) {
-        setProduct((previousProduct) =>
-          previousProduct
-            ? {
-                ...previousProduct,
-                availableItems: data.availableItems,
-              }
-            : previousProduct,
-        );
-      }
-    });
-
-    return () => {
-      socket.off("productsUpdated");
-      socket.disconnect();
-    };
-  }, [id]);
 
   if (!product) {
     return (
@@ -67,9 +45,6 @@ function ProductPage() {
     }
     const data = await handleCart(product._id, quantity);
     console.log("respond from add to cart:", data);
-    if (data && data.product) {
-      setProduct(data.product);
-    }
   };
 
   return (

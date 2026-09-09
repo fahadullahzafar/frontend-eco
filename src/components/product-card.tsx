@@ -8,10 +8,10 @@ import { handleCart } from "./function/handlecart";
 
 interface ProductCardProps {
   item: Product;
-  onStockUpdate: (productId: string, availableItems: number) => void;
+  onStockUpdate?: (productId: string, availableItems: number) => void;
 }
 
-const ProductCard = ({ item, onStockUpdate }: ProductCardProps) => {
+const ProductCard = ({ item }: ProductCardProps) => {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
@@ -26,10 +26,6 @@ const ProductCard = ({ item, onStockUpdate }: ProductCardProps) => {
     const data = await handleCart(item._id, quantity);
 
     console.log("Response from add to cart:", data);
-
-    if (data && data.product) {
-      onStockUpdate(item._id, data.product.availableItems);
-    }
   };
 
   return (
