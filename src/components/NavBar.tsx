@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
 function NavBar() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, isAdmin, logout } = useAuth();
   const { cartCount } = useCart();
   const navigate = useNavigate();
 
@@ -49,6 +49,15 @@ function NavBar() {
             <Link to="/Orders" className="hover:text-green-900 transition">
               Orders
             </Link>
+
+            {isAdmin && (
+              <Link
+                to="/Admin"
+                className="bg-green-800 text-white text-xs font-semibold px-2.5 py-1 rounded-md hover:bg-green-900 transition"
+              >
+                Admin
+              </Link>
+            )}
           </>
         ) : (
           <>
